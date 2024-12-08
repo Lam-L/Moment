@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import store from '@/store'; 
 
 // 使用环境变量配置基础 URL
 // 配置 Axios 实例
@@ -21,9 +21,11 @@ export const Sign  = (username, password) => {
 export const Login = (username, password) => {
   console.log('Login data:', { username, password });  // 打印请求数据
 
-  return api.post('/api/login', { username, password })
+  return api.post('/api/auth/login', { username, password })
     .then(response => {
       console.log('Login response:', response); // 打印响应内容
+      const userid = response.data.userid;
+      store.dispatch('login', userid);
       return response;  // 返回响应
     })
     .catch(error => {

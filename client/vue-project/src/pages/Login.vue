@@ -54,10 +54,9 @@ export default {
 
         // 假设登录成功后返回数据中有 token 或用户信息
         console.log('Login success:', response.data);
-        
+        this.$store.dispatch('login', response.data.userid);
         // 你可以将 token 存储到 localStorage 或Vuex 中
         localStorage.setItem('token', response.data.token);
-
         // 登录成功后，跳转到主页
         this.$router.push('/');
       } catch (error) {

@@ -25,10 +25,10 @@ function configurePassport(passport) {
     })
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => done(null, user.userid));
   passport.deserializeUser(async (id, done) => {
     try {
-      const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
+      const [rows] = await db.query("SELECT * FROM users WHERE userid = ?", [id]);
       const user = rows[0];
       done(null, user);
     } catch (err) {
