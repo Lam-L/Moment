@@ -48,6 +48,11 @@ export default {
         console.error('Error toggling like:', error);
       }
     }
+  },
+  getters: {
+    getUserId(state) {
+      return state.userid;
+    }
   }
 };
 </script>

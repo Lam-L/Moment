@@ -8,6 +8,7 @@ const configurePassport = require("./services/passport");
 // 路由模块
 const authRoutes = require("./routes/auth");
 const postRoutes = require("./routes/posts");
+const habitRoutes = require("./routes/habits");
 
 const app = express();
 
@@ -31,6 +32,7 @@ configurePassport(passport);
 // 路由
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
+app.use("/api/habit", habitRoutes);
 
 // 启动服务器
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));
