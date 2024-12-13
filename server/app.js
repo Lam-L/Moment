@@ -9,6 +9,9 @@ const configurePassport = require("./services/passport");
 const authRoutes = require("./routes/auth");
 const postRoutes = require("./routes/posts");
 const habitRoutes = require("./routes/habits");
+const momentRoutes = require("./routes/moments");
+const commentRoutes = require("./routes/comments");
+const tagRoutes = require("./routes/tags");
 
 const app = express();
 
@@ -33,6 +36,9 @@ configurePassport(passport);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/habit", habitRoutes);
+app.use("/api/moment", momentRoutes);
+app.use("/api/comment", commentRoutes);
+app.use("/api/tag", tagRoutes);
 
 // 启动服务器
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));

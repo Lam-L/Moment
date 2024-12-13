@@ -33,22 +33,18 @@ router.get("/:userid", async (req, res, next) => {
 
 
 router.post("/", async (req, res, next) => {
-  const { posttitle, content, userid } = req.body;
+  const { commenttitle, content, userid, tagid } = req.body;
   console.log(req.body);
-
-  if (!content || !userid || !posttitle) {
-    return res.status(400).json({ message: "Content and userid are required" });
-  }
 
   try {
     const [result] = await db.query(
-      "INSERT INTO posts (posttitle ,content, userid, createdAt) VALUES (?, ?, ?, ?)",
-      [posttitle, content, userid, new Date()]
+      "INSERT INTO moments (commenttitle ,content, userid, tagid, createdAt) VALUES (?, ?, ?, ?, ?)",
+      [commenttitle, content, userid, tagid, new Date()]
     );
 
     res.json({
-      message: "Post created successfully",
-      postId: result.insertId,
+      message: "Moment created successfully",
+      momentId: result.insertId,
       createdAt: new Date(),
     });
   } catch (err) {
@@ -56,28 +52,5 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// 点赞
-router.post("/:postid/like", async (req, res, next) => {
-  const { userid } = req.body;
-  const postid = req.params.postid;
-  const date = new Date();
-  console.log(postid);
-  console.log(date);
-  console.log(userid)
-  try {
-    const [result] = await db.query(
-      "INSERT INTO likes (postid, userid, createdAt) VALUES (?, ?, ?)",
-      [postid, userid, date]
-    );
-    res.json({
-      success: true,
-      message: "Like created successfully",
-      postId: result.insertId,
-      createdAt: new Date(),
-    });
-  }catch (err){
-    next(err);
-  }
-});
 
 module.exports = router;
