@@ -3,6 +3,9 @@
     Good Morning {{ username }}
   </header>
   <main>
+    <div class="main-container">
+      <MonthlyMood />
+      <Journal/>
       <section class="meditation-section">
         <h2 class="meditation-title">Today's Meditation</h2>
         <p class="meditation-content">
@@ -11,20 +14,20 @@
         </p>
         <button class="meditation-btn" @click="startMeditation">Start Meditation</button>
     </section>
-    
-    <Journal/>
+    </div>
     <HabitTracker :completedDays="completedDays" />
   </main>
 </template>
 
 <script>
-
 import HabitTracker from '../components/HabitTracker.vue';
 import Journal from '@/components/Journal.vue';
+import MonthlyMood from '@/components/MonthlyMood.vue';
 export default {
   components: {
     HabitTracker,
-    Journal
+    Journal,
+    MonthlyMood
   },
   data() {
     return {
@@ -41,6 +44,10 @@ export default {
 </script>
 
 <style>
+.main-container {
+  display: flex;
+}
+
 .journal-section {
   background-color: #fff3e6;
   border-radius: 10px;

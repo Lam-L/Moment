@@ -5,13 +5,17 @@
    <button @click="showModal = true">Create New Post</button>
     <!-- Modal 组件 -->
     <CreatePost :isVisible="showModal" :closeModal="closeModal" />
-    <PostList />
+    <div class="main">
+        <PostList />
+        <UserList />
+    </div>
   </div>
 </template>
 
 <script>
 import CreatePost from "@/components/CreatePost.vue";
 import PostList from "@/components/PostList.vue";
+import UserList from "@/components/UserList.vue";
 import { ref } from 'vue';
 
 export default {
@@ -19,6 +23,7 @@ export default {
   components: {
     PostList,
     CreatePost,
+    UserList,
   },
   data() {
     return {
@@ -35,6 +40,9 @@ export default {
 </script>
 
 <style scoped>
+.main {
+  display: flex;
+}
 .home {
   padding: 20px;
 }

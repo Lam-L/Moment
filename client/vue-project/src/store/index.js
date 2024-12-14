@@ -16,6 +16,7 @@ const store = createStore({
     },
     logout(state) {
       state.isAuthenticated = false;
+      localStorage.removeItem('userid');
       localStorage.setItem('isAuthenticated', 'false');
     },
   },
@@ -27,6 +28,10 @@ const store = createStore({
       commit('logout');
     },
   },
+  getters: {
+    isLoggedIn: state=>!!state.userid,
+    userid: (state) => state.userid
+  }
 });
 
 export default store;

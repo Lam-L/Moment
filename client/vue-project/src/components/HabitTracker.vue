@@ -35,6 +35,14 @@ export default {
         }
       ]
     };
+  },
+  created() {
+    this.fetchHabits();
+  },
+  methods: {
+    async fetchHabits(){
+      console.log("");
+    },
   }
 };
 </script>

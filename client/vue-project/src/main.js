@@ -11,7 +11,7 @@ import axios from 'axios';
 // app.mount('#app')
 axios.default.baseURL = 'http://localhost:3000'
 
-app = createApp(App)
+const app = createApp(App)
 .use(store)
 .use(router)  
 .mount('#app')

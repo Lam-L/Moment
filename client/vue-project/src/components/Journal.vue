@@ -1,18 +1,19 @@
 <template>
   <div class="journal-container">
-    <h2>Feel Free to Journal</h2>
+    <h2>Today's Journal</h2>
     <textarea 
       v-model="journalText" 
       placeholder="Write your thoughts here..." 
       rows="6" 
       class="journal-textarea"
     ></textarea>
-    <button @click="submitJournal" class="submit-btn">Submit</button>
+    <button @click="handleSubmit" class="submit-btn">Submit</button>
     <p v-if="submitted" class="confirmation-message">Your journal has been saved!</p>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'Journal',
   data() {
@@ -22,19 +23,22 @@ export default {
     };
   },
   methods: {
-    submitJournal() {
-      if (this.journalText.trim()) {
-        // 假设在这里你会将日记内容提交到后端，暂时只做本地存储
-        console.log('Journal submitted:', this.journalText);
-        this.submitted = true;
+    async handleSubmit() {
+      try {
+        // 发送 HTTP 请求到后台 API 创建新帖子
+        const response = await axios.post('http://localhost:3000/api/moment', {
+          userid: this.$store.state.userid,
+          content: this.journalText
+        });
 
-        // 模拟保存后的清空
-        setTimeout(() => {
-          this.journalText = '';
-          this.submitted = false;
-        }, 2000); // 2秒后清空
-      } else {
-        alert('Please write something before submitting!');
+        // 输出后台响应
+        console.log('New Post Created:', response.data);
+
+        // 提示用户帖子已创建
+        alert('Post created successfully!');
+      } catch (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post.');
       }
     }
   }
