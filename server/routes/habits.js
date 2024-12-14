@@ -12,7 +12,7 @@ router.get("/:userid", async(req, res, next) => {
         `SELECT
         h.*, hl.*
         from habits h
-        left join habit_logs hl
+        inner join habit_logs hl
         on 
         h.habitid = hl.habitid
         where h.userid = ?
@@ -21,8 +21,12 @@ router.get("/:userid", async(req, res, next) => {
         const [rows] = await db.query(query
         ,[userid, start_date, end_date, start_date]);
         
-        const groupedHabits = groupBy(rows, 'habitid');
+        console.log(rows);
+        console.log("---------");
 
+        const groupedHabits = groupBy(rows, 'habitname');
+
+        console.log(groupedHabits);
         res.json({
             habits: groupedHabits,
         }
