@@ -4,9 +4,9 @@
     <div class="user-item" v-for="user in users" :key="user.id">
       <img :src="user.avatar" alt="User Avatar" class="user-avatar" />
       <div class="user-info">
-        <h3>{{ user.name }}</h3>
+        <h3>{{ user.username }}</h3>
         <p>{{ user.description }}</p>
-        <button @click="followUser(user.id)" class="follow-btn">
+        <button @click="followUser(user)" class="follow-btn">
           {{ user.isFollowing ? 'Unfollow' : 'Follow' }}
         </button>
       </div>
@@ -15,47 +15,68 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
-  name: 'UserList',
+  name: "UserList",
   data() {
     return {
       // 模拟静态用户数据，可以替换为从 API 或 Vuex 中获取数据
-      users: [
-        {
-          id: 1,
-          name: 'John Doe',
-          avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-          description: 'Lover of technology and books.',
-          isFollowing: false,
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-          description: 'Travel enthusiast and photographer.',
-          isFollowing: false,
-        },
-        {
-          id: 3,
-          name: 'Sam Wilson',
-          avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-          description: 'Music producer and gamer.',
-          isFollowing: false,
-        },
-        // 添加更多用户...
-      ]
+      users: null,
     };
   },
+  created() {
+    this.fetchRandomUser();
+  },
   methods: {
-    followUser(userId) {
-      const user = this.users.find(u => u.id === userId);
-      if (user) {
-        user.isFollowing = !user.isFollowing;
-        // 在此你可以将更新的关注状态同步到后端或者 Vuex
-        console.log(user.isFollowing ? 'Following user' : 'Unfollowed user');
+    async fetchRandomUser(){
+      try {
+        const response = await axios.get(`http://localhost:3000/api/user/${this.$store.state.userid}/similar-users`)
+        this.users = response.data.similarUsers;
+        this.users.map((item) => item.avatar = `https://randomuser.me/api/portraits/men/${item.avatar}.jpg`)
+      } catch (err) {
+        console.log(err);
+        this.error = "What"
       }
-    }
-  }
+    },
+    async followUser(user) {
+      const myUserId = localStorage.getItem("userid"); // 假设本地存储了当前用户ID
+      if (!myUserId) {
+        alert("User ID not found. Please log in.");
+        return;
+      }
+
+      console.log(myUserId)
+      console.log(user.id)
+
+      try {
+        // 调用后端API切换关注状态
+        const response = await fetch(`http://localhost:3000/api/follow`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            followerId: myUserId, // 当前用户ID
+            followedId: user.id // 当前用户ID
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // 更新本地用户的关注状态
+          user.isFollowing = !user.isFollowing;
+          console.log(data.message);
+        } else {
+          console.error(data.message);
+          alert("Failed to update follow status.");
+        }
+      } catch (error) {
+        console.error("Error following user:", error);
+        alert("An error occurred while updating follow status.");
+      }
+    },
+  },
 };
 </script>
 

@@ -41,6 +41,26 @@ const routes = [
     path: '/welcome',
     name: 'Welcome',
     component: ()=> import('../pages/Welcome.vue')
+   },
+   {
+    path: '/profile',
+    name: 'Profile',
+    component: ()=> import('../pages/Profile.vue')
+   },
+   {
+    path: '/user/:userid/post',
+    name: "UserPost",
+    component: () => import("../pages/UserPost.vue")
+   },
+    {
+    path: '/user/:userid/following',
+    name: "Following",
+    component: () => import("../pages/Following.vue")
+   },
+    {
+    path: '/journal-history',
+    name: "JournalHistory",
+    component: () => import("../pages/JournalHistory.vue")
    }
 ];
 

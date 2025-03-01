@@ -9,7 +9,7 @@
       
       <!-- 登录后显示的内容 -->
       <li v-if="isAuthenticated"><router-link to="/post">Posts</router-link></li>
-      <li v-if="isAuthenticated"><router-link to="/my-profile">My Profile</router-link></li>
+      <li v-if="isAuthenticated"><router-link to="/profile">My Profile</router-link></li>
       <li v-if="isAuthenticated">
         <button @click="logout">Logout</button>
       </li>

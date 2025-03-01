@@ -6,27 +6,29 @@
         <span v-for="day in weekDays" :key="day" class="calendar-day-name">{{ day }}</span>
       </div>
       <div class="calendar-body">
+        <!-- 确保渲染时跳过 null 日期 -->
         <div
           v-for="(date, index) in daysInMonth"
           :key="index"
+          v-if="date !== null" 
           class="calendar-day"
-          :class="{'has-mood': moods[index]?.mood}"
-          :style="{ backgroundColor: moods[index]?.color || '#f0f0f0' }"
-          @click="toggleMoodPicker(index)"
+          :class="{'has-mood': moods[date - 1]?.mood}"
+          :style="{ backgroundColor: this.moodOptions[moods[date - 1]?.value - 1]?.color || '#f0f0f0' }"
+          @click="toggleMoodPicker(date)" 
         >
           <span>{{ date }}</span>
-          <div v-if="visibleMoodIndex === index" class="mood-picker">
+          <div v-if="date && visibleMoodIndex === date" class="mood-picker">
             <button
               v-for="mood in moodOptions"
               :key="mood.icon"
               :style="{ backgroundColor: mood.color }"
-              @click="setMood(index, mood)"
+              @click="setMood(date, mood)"
             >
               {{ mood.icon }}
             </button>
           </div>
-          <div v-if="moods[index]?.mood" class="mood-icon">
-            {{ moods[index].icon }}
+          <div v-if="moods[date - 1]?.value" class="mood-icon">
+            {{ moodOptions[moods[date - 1]?.value - 1]?.icon }}
           </div>
         </div>
       </div>
@@ -34,22 +36,37 @@
   </div>
 </template>
 
+
 <script>
+import axios from 'axios';
+
 export default {
   name: "MonthlyMood",
+  props: {
+    moods: {
+      type: Array,
+      required: true
+    },
+    year: {
+      type: Number,
+      required: true
+    },
+    month: {
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
-      currentDate: new Date(),
-      weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], // 星期名称
+      weekDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       moodOptions: [
-        { icon: "😀", color: "#FFD700" },
-        { icon: "😊", color: "#ADFF2F" },
-        { icon: "😐", color: "#F0E68C" },
-        { icon: "😢", color: "#87CEFA" },
-        { icon: "😡", color: "#FF6347" }
+        { value: 1, icon: "😀", color: "#FFD700" },
+        { value: 2, icon: "😊", color: "#ADFF2F" },
+        { value: 3, icon: "😐", color: "#F0E68C" },
+        { value: 4, icon: "😢", color: "#87CEFA" },
+        { value: 5, icon: "😡", color: "#FF6347" }
       ],
-      moods: [], // 每天的心情状态
-      visibleMoodIndex: null // 当前显示心情选择器的日期索引
+      visibleMoodIndex: null // 当前显示心情选择器的日期
     };
   },
   computed: {
@@ -58,23 +75,21 @@ export default {
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
       ];
-      return `${months[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+      return `${months[this.month]} ${this.year}`;
     },
-    // 计算当前月的日期列表
     daysInMonth() {
       const days = [];
-      const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
-      const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
-      // 获取本月的第一天是星期几
+      const firstDay = new Date(this.year, this.month, 1);
+      const lastDay = new Date(this.year, this.month + 1, 0);
       const firstDayWeekday = firstDay.getDay();
-      // 获取本月的天数
       const totalDays = lastDay.getDate();
-      
-      // 填充空白日期
+
+      // 填充空白占位
       for (let i = 0; i < firstDayWeekday; i++) {
         days.push(null);
       }
-      // 填充实际日期
+
+      // 填充日期
       for (let i = 1; i <= totalDays; i++) {
         days.push(i);
       }
@@ -82,21 +97,49 @@ export default {
     }
   },
   methods: {
-    toggleMoodPicker(index) {
-      this.visibleMoodIndex = this.visibleMoodIndex === index ? null : index;
+    toggleMoodPicker(date) {
+      this.visibleMoodIndex = this.visibleMoodIndex === date ? null : date;
     },
-    setMood(index, mood) {
-      if (!this.moods[index]) {
-        this.moods[index] = {};
+
+    // 设置心情并发送 POST 请求
+    async setMood(date, mood) {
+      const formattedDate = new Date(this.year, this.month, date+1).toISOString().split('T')[0]; // 格式化日期
+      
+      try {
+        const userid = this.$store.state.userid; // 假设为当前用户 ID
+
+        // 发送 POST 请求到后端 API
+        const response = await axios.post('http://localhost:3000/api/mood/', {
+          userid,
+          createdAt: formattedDate, // 精确到点击的日期
+          mood: mood.value
+        });
+
+        if (response.status === 201) {
+          console.log("Mood added successfully", response.data);
+
+          // 更新本地 moods 数据
+          const dayIndex = date - 1; // 日期对应的索引
+          if (!this.moods[dayIndex]) {
+            this.moods[dayIndex] = {};
+          }
+          this.moods[dayIndex].value = mood.value;
+          this.moods[dayIndex].mood = mood.icon;
+          this.moods[dayIndex].color = mood.color;
+
+          this.$emit('update-moods', this.moods); // 通知父组件更新数据
+        }
+      } catch (error) {
+        console.error("Error adding mood:", error);
       }
-      this.moods[index].mood = mood.icon;
-      this.moods[index].color = mood.color;
-      this.moods[index].icon = mood.icon;
+
+      // 隐藏心情选择器
       this.visibleMoodIndex = null;
     }
   }
 };
 </script>
+
 
 <style scoped>
 .monthly-mood {

@@ -1,11 +1,12 @@
 <template>
   <header>
-    Good Morning {{ username }}
   </header>
   <main>
     <div class="main-container">
-      <MonthlyMood />
-      <Journal/>
+      <ParentComponent />
+      <section class="journal-section">
+        <Journal/>
+      </section>  
       <section class="meditation-section">
         <h2 class="meditation-title">Today's Meditation</h2>
         <p class="meditation-content">
@@ -16,18 +17,24 @@
     </section>
     </div>
     <HabitTracker :completedDays="completedDays" />
+    <!-- <MoodChart /> -->
   </main>
+
 </template>
 
 <script>
 import HabitTracker from '../components/HabitTracker.vue';
 import Journal from '@/components/Journal.vue';
 import MonthlyMood from '@/components/MonthlyMood.vue';
+import ParentComponent from '@/components/ParentComponent.vue';
+import MoodChart from '@/components/MoodChart.vue';
 export default {
   components: {
     HabitTracker,
     Journal,
-    MonthlyMood
+    MonthlyMood,
+    ParentComponent,
+    MoodChart,
   },
   data() {
     return {
@@ -49,20 +56,20 @@ export default {
 }
 
 .journal-section {
-  background-color: #fff3e6;
   border-radius: 10px;
   padding: 30px;
   max-width: 700px;
   margin: 0 auto;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
 }
 
 .journal-title {
+  width: 100%;
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #ff8c00;
 }
 
 .journal-textarea {
